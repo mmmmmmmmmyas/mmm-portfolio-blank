@@ -7,16 +7,19 @@
 
 :root {
   --cols: 12;
-  --gutter: 24px;
-  --margin: 64px;
+  --gutter: 20pt;
+  --margin: 20pt;
   --container-max: 1440px;
+  /* Width of a single column, standalone -- for elements outside the
+     grid (fixed/absolute) that still need to size themselves against N
+     columns' worth of width via calc(). Recomputes automatically at the
+     mobile breakpoint since it depends on --cols. */
+  --col: calc((min(100vw, var(--container-max)) - 2 * var(--margin) - (var(--cols) - 1) * var(--gutter)) / var(--cols));
 }
 
 @media (max-width: 1024px) {
   :root {
     --cols: 4;
-    --gutter: 16px;
-    --margin: 24px;
   }
 }
 

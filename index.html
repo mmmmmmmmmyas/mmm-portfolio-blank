@@ -4,15 +4,46 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MMM</title>
-  <link rel="preload" as="image" href="assets/logo-motion-6s.gif" />
   <link rel="stylesheet" href="css/grid.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <main class="hero grid">
-    <div class="logo-wrap">
-      <img class="logo-mark" src="assets/logo-motion-6s.gif" alt="MMM" />
+    <div class="menu">
+      <div class="menu-item menu-item--year">2026&copy;</div>
+      <div class="menu-item menu-item--social">
+        <span class="dim">IG</span> <span class="menu-slash">/</span> <span class="dim">X</span> <span class="menu-slash">/</span>
+        <a class="menu-link" href="https://www.linkedin.com/in/yasin-abdillah-5a8641118/" target="_blank" rel="noopener noreferrer">LKDN</a>
+      </div>
+      <div class="menu-item menu-item--brand">
+        <span class="brand-mmm">MMM</span><span class="brand-dotworks">.WORKS</span>
+      </div>
+      <div class="menu-item menu-item--about">
+        <button type="button" class="about-label" id="about-trigger" aria-haspopup="dialog" aria-expanded="false" aria-controls="about-modal">ABOUT</button>
+        <img class="abt-hover-img abt-hover-img--a" src="assets/abt-hover-img-a.png" alt="" aria-hidden="true" />
+        <img class="abt-hover-img abt-hover-img--b" src="assets/abt-hover-img-b.png" alt="" aria-hidden="true" />
+      </div>
+    </div>
+    <img class="profile-pic" id="profile-pic" src="assets/profile-pic.png" alt="" aria-hidden="true" hidden />
+    <div class="sphere-wrap">
+      <canvas id="globe"></canvas>
     </div>
   </main>
+
+  <div class="about-modal" id="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-trigger" hidden>
+    <div class="about-modal__row">
+      <div class="about-modal__text">
+        <p>Yasin is a Multidisciplinary Designer spending his time in tech and creative industry.</p>
+        <p>Dedicating his career in the intersection of brand and product design, Yasin&rsquo;s crafts in both digital &amp; print medias ranging from User Interfaces and Experience, Graphic Design, to Brand Identity.</p>
+      </div>
+      <button type="button" class="about-modal__close" aria-label="Close">[x]</button>
+    </div>
+  </div>
+  <!-- Hidden texture source for the globe decal: a canvas can't reliably keep
+       advancing an animated <img> GIF's frame via drawImage, but video always
+       keeps its own playback clock running, so it's used here instead. -->
+  <video class="logo-video" src="assets/logo-motion-6s.mp4" autoplay muted loop playsinline></video>
+  <script src="js/globe.js" defer></script>
+  <script src="js/about-modal.js" defer></script>
 </body>
 </html>

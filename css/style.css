@@ -1,3 +1,27 @@
+@font-face {
+  font-family: "Space Grotesk";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("../assets/fonts/SpaceGrotesk-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("../assets/fonts/SpaceGrotesk-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  src: url("../assets/fonts/SpaceGrotesk-Light.woff2") format("woff2");
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -8,6 +32,8 @@ html,
 body {
   height: 100%;
   background: #000;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 500;
 }
 
 .hero {
@@ -15,19 +41,296 @@ body {
   align-items: center;
 }
 
-/* 2 columns wide, centered: cols 6/8 of 12 on desktop, 2/4 of 4 on mobile */
-.logo-wrap {
-  grid-column: 6 / 8;
+/* left of the globe, same row: spans 4 columns wide overall, but the
+   items themselves hug their own text (flex, not equal grid columns) --
+   2026/social/brand sit with equal gaps between them, and ABOUT is
+   pushed out to the far right edge via its own auto margin.
+   Stacked above the globe (see .sphere-wrap) so that if the globe's
+   aspect-ratio-driven height ever overflows its row on narrow/short
+   viewports, it passes behind the menu instead of covering the labels. */
+.menu {
+  grid-column: 1 / 5;
+  grid-row: 1;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: var(--gutter);
+}
+
+.menu-item {
+  font-size: 11pt;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.menu-item--year {
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  opacity: 0.48;
+}
+
+.menu-item--social {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.menu-item--social .dim {
+  opacity: 0.48;
+}
+
+.menu-item--social .menu-slash {
+  opacity: 0.48;
+}
+
+.menu-item--social .menu-link {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.menu-item--social .menu-link:hover {
+  text-decoration: underline;
+}
+
+.menu-item--brand {
+  font-weight: 400;
+  opacity: 0.48;
+}
+
+.menu-item--brand .brand-mmm {
+  letter-spacing: 0.08em;
+}
+
+.menu-item--brand .brand-dotworks {
+  letter-spacing: -0.04em;
+}
+
+.menu-item--about {
+  position: relative;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  margin-left: auto;
+}
+
+.about-label {
+  /* reset <button> chrome so it reads exactly like the other plain-text labels */
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+}
+
+.menu-item--about:hover .about-label {
+  opacity: 1;
+}
+
+/* Both start scaled to nothing, pinned at the ABOUT text's own center
+   point, then grow to their real size while sliding out to their
+   designated offset -- same transform property on both ends (translate
+   then scale) so the browser can interpolate it smoothly. */
+.abt-hover-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.abt-hover-img--a {
+  width: 93px;
+  height: 87px;
+}
+
+.abt-hover-img--b {
+  width: 52px;
+  height: 65px;
+}
+
+.menu-item--about:hover .abt-hover-img {
+  opacity: 1;
+}
+
+.menu-item--about:hover .abt-hover-img--a {
+  transform: translate(calc(-50% + 58pt), calc(-50% - 58pt)) scale(1);
+}
+
+.menu-item--about:hover .abt-hover-img--b {
+  transform: translate(calc(-50% - 40pt), calc(-50% + 40pt)) scale(1);
+}
+
+/* While the modal is open (see about-modal.js), the hover reveal is
+   pointless -- ABOUT's only job at that point is to close it -- so
+   these override the :hover rules above back to their rest state. */
+.menu-item--about.about-active:hover .about-label {
+  opacity: 0.75;
+}
+
+.menu-item--about.about-active:hover .abt-hover-img--a,
+.menu-item--about.about-active:hover .abt-hover-img--b {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+}
+
+/* 4 columns wide, centered: cols 5/9 of 12 on desktop, full 1/5 of 4 on mobile.
+   Sized to 110% of that and re-centered via justify-self, so it overflows
+   its own column area symmetrically rather than being constrained to it --
+   nothing up the ancestor chain clips overflow, so this stays fully visible. */
+.sphere-wrap {
+  grid-column: 5 / 9;
+  grid-row: 1;
+  position: relative;
+  z-index: 1;
+  width: 110%;
+  justify-self: center;
+  aspect-ratio: 1 / 1;
+  /* The decal is drawn from an opaque video frame, so its black areas
+     are fully opaque canvas pixels even with the internal lighten trick
+     (that only affects blending against the wireframe drawn earlier in
+     the same canvas, not against whatever's behind the element itself).
+     This makes the whole globe blend against its real backdrop too, so
+     .profile-pic can show through -- against the page's plain black
+     background this is a no-op (lighten against black == source-over). */
+  mix-blend-mode: lighten;
+}
+
+/* Same grid area as .sphere-wrap, so its center point matches the
+   globe's exactly. Lower z-index puts it behind the globe. Only ever
+   shown while the about modal is open (toggled in about-modal.js).
+   Scales in from 80% to 100% on open and reverses on close -- see
+   about-modal.js for why this can't just be the [hidden] attribute
+   alone (transitions can't run across a display:none boundary). */
+.profile-pic {
+  grid-column: 5 / 9;
+  grid-row: 1;
+  position: relative;
+  z-index: 0;
+  justify-self: center;
+  align-self: center;
+  width: calc((var(--col) * 4 + var(--gutter) * 3) * 0.448); /* 4 columns, reduced by 80%, doubled, +12% */
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 32pt;
+  corner-shape: superellipse(2); /* 100% corner smoothing; ignored where unsupported, falls back to plain rounding */
+  opacity: 0;
+  transform: scale(0.8);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.profile-pic.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.profile-pic[hidden] {
+  display: none;
+}
+
+/* Positioned in JS (see about-modal.js) to align exactly with "2026©"'s
+   own top-left corner -- the hero row is vertically centered, so a
+   grid-based position would land at the top of the viewport instead.
+   Width uses --col (defined globally in grid.css) since this element
+   lives outside the grid (position: fixed) and can't size itself
+   against the real columns via grid-column. */
+.about-modal {
+  position: fixed;
+  z-index: 10;
+  width: calc(var(--col) * 3 + var(--gutter) * 2);
+  background: #000;
+  color: #fff;
+  padding: 0; /* no top/bottom padding -- height hugs the paragraph text exactly */
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  line-height: 1.44;
+}
+
+.about-modal[hidden] {
+  display: none;
+}
+
+.about-modal__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--col); /* one grid column's width between the text and the close button */
+}
+
+.about-modal__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  font-size: 11pt;
+  opacity: 0.8;
+}
+
+.about-modal__close {
+  flex: none;
+  font: inherit;
+  font-size: 11pt;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.about-modal__close:hover {
+  opacity: 1;
 }
 
 @media (max-width: 1024px) {
-  .logo-wrap {
-    grid-column: 2 / 4;
+  .hero {
+    grid-template-rows: auto 1fr;
+    padding-top: var(--margin);
+  }
+
+  .sphere-wrap {
+    grid-column: 1 / 5;
+    grid-row: 2;
+  }
+
+  .profile-pic {
+    grid-column: 1 / 5;
+    grid-row: 2;
+    /* .sphere-wrap's own width (110%), inset 20pt on each side -- since
+       it's a 1:1 square, that's an even 20pt gap on all four edges. */
+    width: calc(110% - 40pt);
+  }
+
+  /* full width of the mobile menu row (all 4 columns) instead of 3 --
+     covers end to end, including the ABOUT label itself this time,
+     since there's no room to leave it peeking out on a narrow screen */
+  .about-modal {
+    width: calc(var(--col) * 4 + var(--gutter) * 3);
   }
 }
 
-.logo-mark {
+.sphere-wrap canvas {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  touch-action: none;
+}
+
+/* Off-screen, not display:none -- it still needs to actually be playing */
+.logo-video {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  top: -9999px;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
 }
