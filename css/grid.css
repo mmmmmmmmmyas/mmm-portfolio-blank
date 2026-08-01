@@ -1,0 +1,31 @@
+/*
+  Grid foundation.
+  Desktop: 12 columns. Mobile (<1024px): 4 columns.
+  Any element's column span/position stays defined in these terms
+  so section placement is consistent across breakpoints.
+*/
+
+:root {
+  --cols: 12;
+  --gutter: 24px;
+  --margin: 64px;
+  --container-max: 1440px;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --cols: 4;
+    --gutter: 16px;
+    --margin: 24px;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: var(--gutter);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--margin);
+  box-sizing: border-box;
+}

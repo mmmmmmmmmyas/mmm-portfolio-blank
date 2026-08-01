@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  background: #000;
+}
+
+.hero {
+  min-height: 100svh;
+  align-items: center;
+}
+
+/* 2 columns wide, centered: cols 6/8 of 12 on desktop, 2/4 of 4 on mobile */
+.logo-wrap {
+  grid-column: 6 / 8;
+}
+
+@media (max-width: 1024px) {
+  .logo-wrap {
+    grid-column: 2 / 4;
+  }
+}
+
+.logo-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+}
