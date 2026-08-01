@@ -59,7 +59,7 @@ body {
 }
 
 .menu-item {
-  font-size: 11pt;
+  font-size: 10pt;
   color: #fff;
   white-space: nowrap;
 }
@@ -179,6 +179,84 @@ body {
   transform: translate(-50%, -50%) scale(0);
 }
 
+/* Mirrors .menu on the opposite side of the globe (cols 9/13 vs 1/5), but
+   the 4 labels sit in equal-width containers instead of hugging their own
+   text -- the long services list needs the fixed width to actually wrap.
+   Its box is taller than .menu's single line (services text wraps to
+   several lines), so centering it the same way .menu is would leave its
+   top edge sitting higher than .menu's -- align-self:start instead, and
+   js/menu-align.js nudges it down via margin-top to match .menu's actual
+   top exactly, since that offset depends on the globe's rendered height
+   and can't be known in advance from CSS alone. */
+.menu--right {
+  grid-column: 9 / 13;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-self: start;
+  /* overrides .menu's inherited baseline alignment -- baseline alignment
+     across 4 columns of mismatched line count (the chip has no text
+     baseline at all) produces unpredictable per-item offsets. Flush
+     top-alignment instead, with js/menu-align.js correcting the
+     remaining line-height leading gap precisely. */
+  align-items: start;
+}
+
+.menu--right .menu-item {
+  opacity: 0.75;
+  white-space: normal;
+}
+
+.menu-item--availability {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* Each chip sets its own opacity individually, so the blanket rule above
+   would compound with it (e.g. 0.75 * 0.35) -- opt this item back out. */
+.menu-item--chips {
+  opacity: 1;
+}
+
+/* Fixed 2 columns so 6 chips always land 2-per-row across 3 rows,
+   regardless of how much room this column actually has. */
+.chip-list {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 0;
+}
+
+.menu-item--services {
+  font-weight: 200;
+  letter-spacing: 0;
+  text-align: justify;
+}
+
+.menu-item--inquiries {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: right;
+}
+
+/* All chips share one fixed width instead of hugging their own text --
+   sized in js/menu-align.js to fit "SEPT.", the longest label, so the
+   rest sit centered inside the same-size pill. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2pt 6pt;
+  font-size: 8pt;
+  letter-spacing: 0.01em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.chip--dim {
+  opacity: 0.35;
+}
+
 /* 4 columns wide, centered: cols 5/9 of 12 on desktop, full 1/5 of 4 on mobile.
    Sized to 110% of that and re-centered via justify-self, so it overflows
    its own column area symmetrically rather than being constrained to it --
@@ -290,15 +368,173 @@ body {
   opacity: 1;
 }
 
+.menu-item--inquiries:hover {
+  opacity: 1;
+}
+
+.inquiries-label {
+  /* reset <button> chrome so it reads exactly like the other plain-text labels */
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Positioned in JS (see inquiry-modal.js) to align with "AVAILABLE FOR
+   PROJECTS:"'s own top-left corner, the same way .about-modal anchors to
+   the year label -- expands rightward from there, covering 3 of the right
+   menu's own 4 equal-width columns (available/chips/services), leaving
+   the INQUIRIES trigger itself clear so it still reads as the close
+   affordance. */
+.inquiry-modal {
+  position: fixed;
+  z-index: 10;
+  width: calc(var(--col) * 3 + var(--gutter) * 2);
+  background: #000;
+  color: #fff;
+  padding: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  line-height: 1.44;
+}
+
+.inquiry-modal[hidden] {
+  display: none;
+}
+
+.inquiry-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--col);
+}
+
+.inquiry-modal__title {
+  font-size: 10pt;
+  line-height: 1.32;
+  opacity: 0.8;
+}
+
+.inquiry-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  font-size: 11pt;
+  margin-top: 4pt;
+}
+
+.inquiry-modal__field-row {
+  display: flex;
+  gap: 1em;
+}
+
+.inquiry-modal__field-row .inquiry-modal__field {
+  flex: 1;
+  min-width: 0;
+}
+
+.inquiry-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+}
+
+.inquiry-modal__label {
+  opacity: 0.6;
+  font-size: 8pt;
+}
+
+.inquiry-modal__input {
+  font: inherit;
+  font-size: 11pt;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  border-radius: 0;
+  opacity: 0.9;
+  padding: 4pt 0;
+  outline: none;
+}
+
+.inquiry-modal__input option {
+  color: #000;
+}
+
+.inquiry-modal__close {
+  flex: none;
+  font: inherit;
+  font-size: 11pt;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.inquiry-modal__submit {
+  align-self: flex-end;
+  font: inherit;
+  font-size: 11pt;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid currentColor;
+  padding: 6pt 14pt;
+  cursor: pointer;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.inquiry-modal__submit:hover {
+  opacity: 1;
+}
+
+.inquiry-modal__close:hover {
+  opacity: 1;
+}
+
 @media (max-width: 1024px) {
   .hero {
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto 1fr auto;
     padding-top: var(--margin);
   }
 
   .sphere-wrap {
     grid-column: 1 / 5;
     grid-row: 2;
+    /* relative offset -- purely visual, doesn't touch row 2's own size,
+       so row 3 (the bottom menu) doesn't get pushed down along with it */
+    position: relative;
+    top: 60pt;
+  }
+
+  /* Stacked below the globe -- cols 9/13 don't exist on the 4-col grid.
+     2x2 instead of 1x4: [available][chips] on top, [services][inquiries]
+     below, each label pinned to its own cell's top-left. */
+  .menu--right {
+    grid-column: 1 / 5;
+    grid-row: 3;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+    padding-bottom: 20pt;
+  }
+
+  /* Desktop locks this to exactly 2-per-row -- on mobile, fit as many
+     equal-width chips as the row has room for before wrapping instead. */
+  .chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .profile-pic {
@@ -307,12 +543,19 @@ body {
     /* .sphere-wrap's own width (110%), inset 20pt on each side -- since
        it's a 1:1 square, that's an even 20pt gap on all four edges. */
     width: calc(110% - 40pt);
+    /* matches .sphere-wrap's offset so it stays centered on the globe */
+    position: relative;
+    top: 60pt;
   }
 
   /* full width of the mobile menu row (all 4 columns) instead of 3 --
      covers end to end, including the ABOUT label itself this time,
      since there's no room to leave it peeking out on a narrow screen */
   .about-modal {
+    width: calc(var(--col) * 4 + var(--gutter) * 3);
+  }
+
+  .inquiry-modal {
     width: calc(var(--col) * 4 + var(--gutter) * 3);
   }
 }

@@ -28,6 +28,23 @@
     <div class="sphere-wrap">
       <canvas id="globe"></canvas>
     </div>
+    <div class="menu menu--right">
+      <div class="menu-item menu-item--availability">AVAILABLE FOR PROJECTS:</div>
+      <div class="menu-item menu-item--chips">
+        <div class="chip-list">
+          <span class="chip chip--dim">OCT.</span>
+          <span class="chip chip--dim">NOV.</span>
+          <span class="chip">DEC.</span>
+          <span class="chip chip--dim">JAN.</span>
+          <span class="chip">FEB.</span>
+          <span class="chip">MAR.</span>
+        </div>
+      </div>
+      <div class="menu-item menu-item--services">UI / UX / CX / BRAND ID / LOGO / VIS-DEV / GRAPHIC DESIGN / MO-GRAPH / ILLUSTRATION.</div>
+      <div class="menu-item menu-item--inquiries">
+        <button type="button" class="inquiries-label" id="inquiry-trigger" aria-haspopup="dialog" aria-expanded="false" aria-controls="inquiry-modal">INQUIRIES</button>
+      </div>
+    </div>
   </main>
 
   <div class="about-modal" id="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-trigger" hidden>
@@ -39,11 +56,51 @@
       <button type="button" class="about-modal__close" aria-label="Close">[x]</button>
     </div>
   </div>
+
+  <div class="inquiry-modal" id="inquiry-modal" role="dialog" aria-modal="true" aria-labelledby="inquiry-trigger" hidden>
+    <div class="inquiry-modal__header">
+      <span class="inquiry-modal__title">Let&rsquo;s Work on Something Exciting</span>
+      <button type="button" class="inquiry-modal__close" aria-label="Close">[x]</button>
+    </div>
+    <form class="inquiry-modal__form">
+      <div class="inquiry-modal__field-row">
+        <label class="inquiry-modal__field">
+          <span class="inquiry-modal__label">Name</span>
+          <input class="inquiry-modal__input" type="text" name="name" required />
+        </label>
+        <label class="inquiry-modal__field">
+          <span class="inquiry-modal__label">Email</span>
+          <input class="inquiry-modal__input" type="email" name="email" required />
+        </label>
+      </div>
+      <label class="inquiry-modal__field">
+        <span class="inquiry-modal__label">Select Services</span>
+        <select class="inquiry-modal__input" name="services">
+          <option value="ui">UI</option>
+          <option value="ux">UX</option>
+          <option value="cx">CX</option>
+          <option value="brand-id">Brand ID</option>
+          <option value="logo">Logo</option>
+          <option value="vis-dev">Vis-Dev</option>
+          <option value="graphic-design">Graphic Design</option>
+          <option value="mo-graph">Mo-Graph</option>
+          <option value="illustration">Illustration</option>
+        </select>
+      </label>
+      <label class="inquiry-modal__field">
+        <span class="inquiry-modal__label">Message</span>
+        <textarea class="inquiry-modal__input" name="message" rows="4"></textarea>
+      </label>
+      <button type="submit" class="inquiry-modal__submit">Send Inquiry</button>
+    </form>
+  </div>
   <!-- Hidden texture source for the globe decal: a canvas can't reliably keep
        advancing an animated <img> GIF's frame via drawImage, but video always
        keeps its own playback clock running, so it's used here instead. -->
   <video class="logo-video" src="assets/logo-motion-6s.mp4" autoplay muted loop playsinline></video>
   <script src="js/globe.js" defer></script>
   <script src="js/about-modal.js" defer></script>
+  <script src="js/inquiry-modal.js" defer></script>
+  <script src="js/menu-align.js" defer></script>
 </body>
 </html>
