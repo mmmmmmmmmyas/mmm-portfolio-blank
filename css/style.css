@@ -36,6 +36,36 @@ body {
   font-weight: 500;
 }
 
+/* No transition on the way in -- it's the first thing in <body>, so it
+   simply paints as soon as the browser gets there, covering the page
+   before anything underneath has a chance to be seen unstyled. Only the
+   way out (see js/preloader.js) fades. */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.preloader.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.preloader[hidden] {
+  display: none;
+}
+
+.preloader__gif {
+  height: 56pt;
+  width: auto;
+}
+
 .hero {
   min-height: 100svh;
   align-items: center;

@@ -3,11 +3,22 @@
   const canvas = document.getElementById("globe");
   if (!wrap || !canvas) return;
 
-  const ctx = canvas.getContext("2d");
+  // desynchronized: true lets the browser skip some compositing sync on
+  // devices that support it (most mobile browsers) -- lower input latency
+  // and one less thing serializing this canvas's paints against the rest
+  // of the page. Falls back to being silently ignored where unsupported.
+  const ctx = canvas.getContext("2d", { desynchronized: true });
+
+  // Touch/mobile devices are typically both weaker (CPU/GPU) and higher
+  // DPR (so every pixel costs more) than the desktop machines this was
+  // built against -- coarser geometry here is what keeps drag interaction
+  // and decal playback smooth on them, not a visual downgrade anyone is
+  // meant to consciously notice at this scale.
+  const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
   const LAT_STEP = 30; // deg, parallels
   const LON_STEP = 30; // deg, meridians
-  const SEGMENTS = 48; // points per line
+  const SEGMENTS = isCoarsePointer ? 24 : 48; // points per line
   const PERSPECTIVE = 3; // camera distance factor, in radii
 
   // The centroid sits on the sphere itself, at the point that faces
@@ -19,7 +30,12 @@
   // subdivided into triangles for the curvature warp (higher = smoother
   // curve, more draw calls).
   const DECAL_HALF_ANGLE = (31.68 * Math.PI) / 180; // 22 * 1.2 * 1.2
-  const DECAL_GRID = 8;
+  // Each grid cell costs 2 full triangle warps (save/clip/transform/
+  // drawImage/restore on the video element) -- by far the most expensive
+  // part of a frame. 8x8 is 128 of those; halving the grid to 4x4 cuts it
+  // to 32, which is what actually keeps the decal's playback smooth
+  // instead of stuttering once mobile GPUs can't keep up with 60fps.
+  const DECAL_GRID = isCoarsePointer ? 4 : 8;
 
   // Texture source for the decal is a <video>, not the hero's <img> GIF --
   // canvas drawImage() doesn't reliably keep advancing an animated GIF's
@@ -126,7 +142,18 @@
     };
   }
 
+  // Each segment's alpha fakes depth shading (nearer = very slightly
+  // brighter), which used to mean a separate beginPath/moveTo/lineTo/
+  // stroke for every single one of the 48 segments in a line -- ~500
+  // individual stroke() calls per frame across all parallels+meridians,
+  // each carrying its own fixed call overhead regardless of how short the
+  // segment actually is. Segments are batched into a handful of alpha
+  // bins instead (rounded to the nearest 1/400th) and each bin is stroked
+  // once via Path2D -- same depth-shaded look at a fraction of the calls,
+  // since the whole gradient only spans ~4 perceptibly different steps
+  // anyway (it's capped at 1% opacity to begin with).
   function drawLine(points, radiusPx, cx, cy) {
+    const bins = new Map();
     for (let i = 0; i < points.length - 1; i++) {
       const a = rotate(points[i]);
       const b = rotate(points[i + 1]);
@@ -134,11 +161,18 @@
       const pb = project(b, radiusPx, cx, cy);
       const zAvg = (a.z + b.z) / 2;
       const alpha = 0.0016 + 0.0084 * ((zAvg + 1) / 2); // capped at 1% opacity
-      ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-      ctx.beginPath();
-      ctx.moveTo(pa.x, pa.y);
-      ctx.lineTo(pb.x, pb.y);
-      ctx.stroke();
+      const bin = Math.round(alpha * 400);
+      let path = bins.get(bin);
+      if (!path) {
+        path = new Path2D();
+        bins.set(bin, path);
+      }
+      path.moveTo(pa.x, pa.y);
+      path.lineTo(pb.x, pb.y);
+    }
+    for (const [bin, path] of bins) {
+      ctx.strokeStyle = `rgba(255,255,255,${bin / 400})`;
+      ctx.stroke(path);
     }
   }
 
@@ -234,7 +268,10 @@
   }
 
   function resize() {
-    dpr = window.devicePixelRatio || 1;
+    // Capped at 2x -- going to a phone's native 3x devicePixelRatio would
+    // triple the pixel fill cost of every stroke/drawImage call for a
+    // sharpness difference nobody perceives on a wireframe this faint.
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     size = wrap.clientWidth;
     canvas.width = size * dpr;
     canvas.height = size * dpr;
@@ -370,6 +407,9 @@
   // extends the live area beyond the canvas's own edges.
   let engaged = false;
 
+  // passive: true -- this handler never calls preventDefault, so marking
+  // it explicitly lets the browser keep touch scrolling elsewhere on the
+  // page off this thread instead of blocking on it.
   window.addEventListener("pointermove", (e) => {
     const rect = canvas.getBoundingClientRect();
     const radiusPx = rect.width * 0.46; // matches the drawn circle in draw()
@@ -404,7 +444,7 @@
       engaged = false;
       scheduleReturn();
     }
-  });
+  }, { passive: true });
 
   new ResizeObserver(resize).observe(wrap);
   resize();

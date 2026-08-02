@@ -6,8 +6,16 @@
   <title>MMM</title>
   <link rel="stylesheet" href="css/grid.css" />
   <link rel="stylesheet" href="css/style.css" />
+  <!-- Kicks off the decal video's fetch immediately, in parallel with
+       everything else, instead of waiting for the deferred scripts to
+       even reach the <video> tag -- it's small (~124KB) but every bit of
+       head start shortens how long the globe shows no logo. -->
+  <link rel="preload" as="video" href="assets/logo-motion-6s.mp4" type="video/mp4" />
 </head>
 <body>
+  <div class="preloader" id="preloader">
+    <img class="preloader__gif" src="assets/loading-gif.gif" alt="" />
+  </div>
   <main class="hero grid">
     <div class="menu">
       <div class="menu-item menu-item--year">2026&copy;</div>
@@ -97,10 +105,11 @@
   <!-- Hidden texture source for the globe decal: a canvas can't reliably keep
        advancing an animated <img> GIF's frame via drawImage, but video always
        keeps its own playback clock running, so it's used here instead. -->
-  <video class="logo-video" src="assets/logo-motion-6s.mp4" autoplay muted loop playsinline></video>
+  <video class="logo-video" src="assets/logo-motion-6s.mp4" autoplay muted loop playsinline preload="auto"></video>
   <script src="js/globe.js" defer></script>
   <script src="js/about-modal.js" defer></script>
   <script src="js/inquiry-modal.js" defer></script>
   <script src="js/menu-align.js" defer></script>
+  <script src="js/preloader.js" defer></script>
 </body>
 </html>
