@@ -571,8 +571,9 @@ body {
     grid-column: 1 / 5;
     grid-row: 2;
     /* .sphere-wrap's own width (110%), inset 20pt on each side -- since
-       it's a 1:1 square, that's an even 20pt gap on all four edges. */
-    width: calc(110% - 40pt);
+       it's a 1:1 square, that's an even 20pt gap on all four edges --
+       then scaled down by 25% of that result. */
+    width: calc((110% - 40pt) * 0.75);
     /* matches .sphere-wrap's offset so it stays centered on the globe */
     position: relative;
     top: 60pt;
